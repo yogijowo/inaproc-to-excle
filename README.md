@@ -1,95 +1,163 @@
 # INAPROC to Excel Exporter
 
-Project ini digunakan untuk **mengambil data RUP INAPROC (Penyedia & Swakelola)** menggunakan **API berbasis cursor** dan **menyimpannya langsung ke file Excel (.xlsx)**.
+Dokumentasi ini dibuat **untuk pemula / orang awam**, agar dapat **menginstall dan menggunakan aplikasi ini di Windows, macOS, maupun Linux** tanpa pengalaman teknis mendalam.
 
-Cocok untuk:
-
-- Audit data pengadaan
-- Rekap RUP per K/L/PD
-- Analisis lanjutan di Excel
-- Arsip data resmi
+Aplikasi ini berfungsi untuk **mengambil data RUP dari API INAPROC** (Penyedia, Swakelola, dan Master Satker) lalu **menyimpannya ke file Excel (.xlsx)**.
 
 ---
 
-## 1. Prasyarat
+## 1. Apa yang Akan Anda Dapatkan?
 
-Pastikan software berikut sudah terpasang:
+Setelah mengikuti panduan ini, Anda bisa:
 
-- **Node.js v18+** (karena menggunakan `fetch` bawaan)
-- **npm**
+- Mengambil data RUP **Penyedia** ke Excel
+- Mengambil data RUP **Swakelola** ke Excel
+- Mengambil **Master Satker** ke Excel
+- Menjalankan perintah langsung dari **Command Prompt / Terminal**
+- Menghasilkan file Excel otomatis dengan nama & timestamp
 
-Cek versi:
+---
+
+## 2. Persiapan Awal (WAJIB)
+
+### 2.1 Install Node.js
+
+Aplikasi ini membutuhkan **Node.js versi 18 atau lebih baru**.
+
+1. Buka browser
+2. Kunjungi: [https://nodejs.org](https://nodejs.org)
+3. Download **LTS Version**
+4. Install (klik Next → Next sampai selesai)
+
+### 2.2 Cek Instalasi
+
+#### Windows
+
+Buka **Command Prompt** atau **PowerShell**:
+
+```bat
+node -v
+npm -v
+```
+
+#### macOS / Linux
+
+Buka **Terminal**:
 
 ```bash
 node -v
 npm -v
 ```
 
+Jika muncul versi (misalnya `v18.x.x`), berarti berhasil.
+
 ---
 
-## 2. Instalasi Project
+## 3. Menyiapkan Folder Aplikasi
 
-### 2.1 Clone / Siapkan Folder
+Anda dapat menyiapkan aplikasi dengan **dua cara**. Untuk pemula, **disarankan menggunakan cara A (Clone dari GitHub)**.
+
+---
+
+### 3.A Cara Paling Mudah (Clone dari GitHub) ✅
+
+1. Buka **Command Prompt / PowerShell (Windows)** atau **Terminal (macOS/Linux)**
+2. Jalankan perintah berikut:
 
 ```bash
-git clone <repo-anda>
-cd inaproc-to-excel
+git clone https://github.com/yogijowo/inaproc-to-excle.git
 ```
 
-Atau jika tanpa Git, cukup buat folder lalu masuk ke folder tersebut.
+3. Masuk ke folder project:
+
+```bash
+cd inaproc-to-excle
+```
+
+> Jika muncul pesan error `git is not recognized`, silakan install Git terlebih dahulu dari:
+> [https://git-scm.com/downloads](https://git-scm.com/downloads)
 
 ---
 
-### 2.2 Install Dependency
+### 3.B Cara Manual (Tanpa Git)
+
+Jika tidak ingin menggunakan Git:
+
+1. Buka halaman:
+   [https://github.com/yogijowo/inaproc-to-excle](https://github.com/yogijowo/inaproc-to-excle)
+2. Klik tombol **Code → Download ZIP**
+3. Extract ZIP
+4. Buka folder hasil extract
+
+---
+
+## 4. Install Dependency (Sekali Saja)
+
+Di dalam folder aplikasi, jalankan:
 
 ```bash
+npm init -y
 npm install xlsx
 ```
 
-Dependency yang digunakan:
-
-- `xlsx` → untuk membuat file Excel
+Tunggu sampai selesai.
 
 ---
 
-## 3. Konfigurasi
+## 4. Install Dependency (Sekali Saja)
 
-### 3.1 File `config.js`
+Di dalam folder aplikasi, jalankan:
 
-File ini **WAJIB ADA** dan berisi token serta base URL API.
+```bash
+npm init -y
+npm install xlsx
+```
+
+Tunggu sampai selesai.
+
+---
+
+## 5. Membuat File Konfigurasi (PENTING)
+
+### 5.1 Buat File `config.js`
+
+File ini menyimpan **TOKEN API** dan **BASE URL**.
+
+Buat file `config.js`, lalu isi:
 
 ```js
 module.exports = {
   BASE_URL: "https://data.inaproc.id",
-  TOKEN: "ISI_TOKEN_ANDA",
+  TOKEN: "ISI_TOKEN_INAPROC_ANDA",
 };
 ```
 
-> ⚠️ **Penting**
-
-- Jangan commit file ini ke GitHub
-- Masukkan `config.js` ke `.gitignore`
+> ⚠️ Ganti `ISI_TOKEN_INAPROC_ANDA` dengan token asli Anda
 
 ---
 
-### 3.2 File `.gitignore`
+### 5.2 Buat File `.gitignore` (Opsional tapi Disarankan)
 
 ```text
 node_modules/
 config.js
 ```
 
+Agar token tidak tersebar jika pakai Git.
+
 ---
 
-## 4. Struktur Folder
+## 6. File yang Digunakan
+
+Pastikan folder berisi file berikut:
 
 ```text
 inaproc-to-excel/
 ├── node_modules/
 ├── config.js
-├── penyedia.js
-├── swakelola.js
-├── mastersatker.js
+├── penyedia-cli.js
+├── swakelola-cli.js
+├── mastersatker-cli.js
 ├── package.json
 ├── package-lock.json
 └── .gitignore
@@ -97,120 +165,110 @@ inaproc-to-excel/
 
 ---
 
-## 5. Cara Penggunaan
+## 7. Cara Menggunakan (SANGAT MUDAH)
 
-### 5.1 Export Paket Penyedia
+### 7.1 Export Paket Penyedia
 
 ```bash
-node penyedia.js
+node penyedia-cli.js D145 2026 100
 ```
 
-Output di terminal:
+Keterangan:
 
-```text
-Ambil 100 data | Total: 100
-Ambil 100 data | Total: 200
-...
-SELESAI
-File dibuat: paket-penyedia-terumumkan-2026_YYYYMMDD_HHMMSS.xlsx
+- `D145` → kode KLPD
+- `2026` → tahun anggaran
+- `100` → jumlah data per halaman (limit)
+
+---
+
+### 7.2 Export Paket Swakelola
+
+```bash
+node swakelola-cli.js D145 2026 100
 ```
 
 ---
 
-### 5.2 Export Paket Swakelola
+### 7.3 Export Master Satker
 
 ```bash
-node swakelola.js
-```
-
-Output:
-
-```text
-Ambil 50 data | Total: 50
-...
-SELESAI
-File dibuat: paket-swakelola-terumumkan-2026_YYYYMMDD_HHMMSS.xlsx
+node mastersatker-cli.js D145 2026
 ```
 
 ---
 
-## 6. Format File Excel
+## 8. Hasil File Excel
 
-- Format: `.xlsx`
-- Sheet: `RUP 2026`
-- Kolom otomatis sesuai field JSON API
-- Filename menggunakan timestamp agar tidak tertimpa
+Setelah selesai, file Excel otomatis dibuat di folder yang sama.
 
 Contoh nama file:
 
 ```text
-paket-swakelola-terumumkan-2026_20260114_093015.xlsx
+paket-penyedia-terumumkan-2026_D145_20260114_101530.xlsx
+paket-swakelola-terumumkan-2026_D145_20260114_102010.xlsx
+mastersatker-2026_D145_20260114_102245.xlsx
 ```
 
----
+File dapat dibuka dengan:
 
-## 7. Kustomisasi
-
-Beberapa bagian yang bisa diubah langsung di file JS:
-
-### 7.1 Ganti Tahun Anggaran
-
-```js
-tahun = 2026;
-```
-
-### 7.2 Ganti Kode KLPD
-
-```js
-kode_klpd = D145;
-```
-
-### 7.3 Ganti Limit per Request
-
-```js
-limit = 100;
-```
+- Microsoft Excel
+- LibreOffice Calc
+- Google Sheets (upload)
 
 ---
 
-## 8. Keamanan
+## 9. Jika Terjadi Error
 
-- Token disimpan terpisah (`config.js`)
-- Tidak hardcode credential
-- Aman digunakan di banyak script
-- Cocok untuk lingkungan kerja tim
+### ❌ `node: command not found`
 
----
+➡️ Node.js belum terinstall atau belum restart PC
 
-## 9. Troubleshooting
+### ❌ `401 / 403 Unauthorized`
 
-### 9.1 Error 401 / 403
+➡️ Token salah atau sudah kedaluwarsa
 
-- Pastikan token valid
-- Pastikan scope token benar
+### ❌ File Excel tidak muncul
 
-### 9.2 File Excel Tidak Terbuat
-
-- Pastikan `xlsx` terinstall
-- Pastikan permission folder writeable
+➡️ Pastikan folder punya izin tulis
 
 ---
 
-## 10. Rencana Pengembangan (Opsional)
+## 10. Tips untuk Pengguna Awam
 
-- Export per Satker (multi sheet)
-- Format rupiah otomatis
-- Filter metode pengadaan
-- Simpan ke database MySQL
-- Jalankan via cron job
+- Tidak perlu mengubah kode jika hanya ingin ambil data
+- Cukup ganti:
 
----
+  - kode KLPD
+  - tahun
 
-## 11. Lisensi
-
-Digunakan untuk kebutuhan internal, audit, dan analisis data pengadaan.
+- Jalankan ulang perintah
 
 ---
 
-📌 **Catatan**
-Project ini mematuhi mekanisme pagination berbasis `cursor` sesuai API INAPROC dan aman untuk data besar.
+## 11. Catatan Teknis (Opsional)
+
+- API menggunakan pagination **cursor**
+- Aman untuk ribuan data
+- Tidak membebani memori berlebihan
+
+---
+
+## 12. Pengembangan Selanjutnya (Opsional)
+
+- 1 perintah export semua (penyedia + swakelola + satker)
+- Excel multi-sheet
+- Jadwal otomatis (cron)
+- Import ke database
+
+---
+
+📌 **Kesimpulan**
+
+Jika Anda bisa:
+
+- Install Node.js
+- Copy–paste perintah
+
+Maka Anda **PASTI BISA** menggunakan aplikasi ini 😊
+
+Jika masih bingung, cukup jalankan satu perintah dan lihat file Excel muncul.
