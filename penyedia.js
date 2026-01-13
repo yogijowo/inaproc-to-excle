@@ -1,8 +1,12 @@
 const XLSX = require("xlsx");
 const { BASE_URL, TOKEN } = require("./config");
 
-// endpoint
+// ================= KONFIGURASI =================
 const ENDPOINT = "/api/v1/rup/paket-penyedia-terumumkan";
+const KODE_KLPD = "D145";
+const TAHUN = 2026;
+const LIMIT = 100;
+// ==============================================
 
 async function exportKeExcel() {
     let cursor = null;
@@ -10,7 +14,8 @@ async function exportKeExcel() {
     let allData = [];
 
     while (hasMore) {
-        let url = `${BASE_URL}${ENDPOINT}?limit=100&kode_klpd=D145&tahun=2026`;
+        let url = `${BASE_URL}${ENDPOINT}` +
+                  `?limit=${LIMIT}&kode_klpd=${KODE_KLPD}&tahun=${TAHUN}`;
 
         if (cursor) {
             url += `&cursor=${encodeURIComponent(cursor)}`;
@@ -37,22 +42,23 @@ async function exportKeExcel() {
         console.log(`Ambil ${json.data.length} data | Total: ${allData.length}`);
     }
 
-    // Simpan ke Excel
+    // === Simpan ke Excel ===
     const worksheet = XLSX.utils.json_to_sheet(allData);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "RUP 2026");
+    XLSX.utils.book_append_sheet(workbook, worksheet, `RUP ${TAHUN}`);
 
-    // Tambahkan tanggal dan waktu ke nama file: YYYYMMDD_HHMMSS
+    // Timestamp: YYYYMMDD_HHMMSS
     const pad = n => n.toString().padStart(2, "0");
     const now = new Date();
-    const timestamp = 
+    const timestamp =
         now.getFullYear().toString() +
         pad(now.getMonth() + 1) +
         pad(now.getDate()) + "_" +
         pad(now.getHours()) +
         pad(now.getMinutes()) +
         pad(now.getSeconds());
-    const filename = `paket-penyedia-terumumkan-2026_${timestamp}.xlsx`;
+
+    const filename = `paket-penyedia-terumumkan-${TAHUN}_${KODE_KLPD}_${timestamp}.xlsx`;
 
     XLSX.writeFile(workbook, filename);
 

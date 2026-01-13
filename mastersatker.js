@@ -3,6 +3,8 @@ const { BASE_URL, TOKEN } = require("./config");
 
 // endpoint
 const ENDPOINT = "/api/v1/rup/master-satker";
+const KODE_KLPD = "D145";
+const TAHUN = 2026;
 
 async function exportKeExcel() {
     let cursor = null;
@@ -10,7 +12,8 @@ async function exportKeExcel() {
     let allData = [];
 
     while (hasMore) {
-        let url = `${BASE_URL}${ENDPOINT}?limit=100&kode_klpd=D145&tahun=2026`;
+        let url = `${BASE_URL}${ENDPOINT}` +
+                          `?kode_klpd=${KODE_KLPD}&tahun=${TAHUN}`;
 
         if (cursor) {
             url += `&cursor=${encodeURIComponent(cursor)}`;
