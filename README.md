@@ -1,7 +1,5 @@
 # INAPROC to Excel Exporter
 
-Dokumentasi ini dibuat **untuk pemula / orang awam**, agar dapat **menginstall dan menggunakan aplikasi ini di Windows, macOS, maupun Linux** tanpa pengalaman teknis mendalam.
-
 Aplikasi ini berfungsi untuk **mengambil data RUP dari API INAPROC** (Penyedia, Swakelola, dan Master Satker) lalu **menyimpannya ke file Excel (.xlsx)**.
 
 ---
