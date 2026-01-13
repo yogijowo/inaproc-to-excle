@@ -21,8 +21,8 @@ if (Number.isNaN(TAHUN) || TAHUN < 2000) {
   process.exit(1);
 }
 
-if (Number.isNaN(LIMIT) || LIMIT <= 0 || LIMIT > 1000) {
-  console.error("❌ limit tidak valid (1–1000). Contoh: node penyedia.js D145 2026 100");
+if (Number.isNaN(LIMIT) || LIMIT <= 0 || LIMIT > 100) {
+  console.error("❌ limit tidak valid (1–100). Contoh: node penyedia.js D145 2026 100");
   process.exit(1);
 }
 
