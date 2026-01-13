@@ -10,12 +10,12 @@ const KODE_KLPD = args[0] || "D145";
 const TAHUN = Number(args[1] || 2026);
 
 if (!KODE_KLPD) {
-  console.error("❌ kode_klpd wajib diisi. Contoh: node mastersatker-cli.js D145 2026");
+  console.error("❌ kode_klpd wajib diisi. Contoh: node mastersatker.js D145 2026");
   process.exit(1);
 }
 
 if (Number.isNaN(TAHUN) || TAHUN < 2000) {
-  console.error("❌ tahun tidak valid. Contoh: node mastersatker-cli.js D145 2026");
+  console.error("❌ tahun tidak valid. Contoh: node mastersatker.js D145 2026");
   process.exit(1);
 }
 
@@ -23,10 +23,16 @@ async function exportKeExcel() {
   let cursor = null;
   let hasMore = true;
   let allData = [];
+  let page = 1;
 
-  console.log(`▶️ Mulai export MASTER SATKER: kode_klpd=${KODE_KLPD}, tahun=${TAHUN}`);
+  console.log(
+    `▶️ Mulai export MASTER SATKER: kode_klpd=${KODE_KLPD}, tahun=${TAHUN}\n`
+  );
 
   while (hasMore) {
+    console.log(`📄 Page ${page}`);
+    console.log(`   ▶ Cursor request : ${cursor ?? "(kosong / awal)"}`);
+
     let url =
       `${BASE_URL}${ENDPOINT}` +
       `?kode_klpd=${encodeURIComponent(KODE_KLPD)}&tahun=${TAHUN}`;
@@ -54,10 +60,16 @@ async function exportKeExcel() {
     const pageCount = Array.isArray(json.data) ? json.data.length : 0;
     allData = allData.concat(json.data || []);
 
-    cursor = json?.meta?.cursor ?? null;
+    const newCursor = json?.meta?.cursor ?? null;
     hasMore = Boolean(json?.meta?.has_more);
 
-    console.log(`Ambil ${pageCount} data | Total: ${allData.length}`);
+    console.log(`   ✔ Data diterima : ${pageCount}`);
+    console.log(`   ▶ Cursor respon : ${newCursor}`);
+    console.log(`   ▶ has_more      : ${hasMore}`);
+    console.log(`   ▶ Total data    : ${allData.length}\n`);
+
+    cursor = newCursor;
+    page++;
   }
 
   // === Simpan ke Excel ===
@@ -80,7 +92,7 @@ async function exportKeExcel() {
   const filename = `mastersatker-${TAHUN}_${KODE_KLPD}_${timestamp}.xlsx`;
   XLSX.writeFile(workbook, filename);
 
-  console.log("\n✅ SELESAI");
+  console.log("✅ SELESAI");
   console.log(`📁 File dibuat: ${filename}`);
 }
 
