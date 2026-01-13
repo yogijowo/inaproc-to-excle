@@ -102,19 +102,6 @@ Tunggu sampai selesai.
 
 ---
 
-## 4. Install Dependency (Sekali Saja)
-
-Di dalam folder aplikasi, jalankan:
-
-```bash
-npm init -y
-npm install xlsx
-```
-
-Tunggu sampai selesai.
-
----
-
 ## 5. Membuat File Konfigurasi (PENTING)
 
 ### 5.1 Buat File `config.js`
