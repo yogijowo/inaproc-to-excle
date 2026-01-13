@@ -153,9 +153,9 @@ Pastikan folder berisi file berikut:
 inaproc-to-excel/
 ├── node_modules/
 ├── config.js
-├── penyedia-cli.js
-├── swakelola-cli.js
-├── mastersatker-cli.js
+├── penyedia.js
+├── swakelola.js
+├── mastersatker.js
 ├── package.json
 ├── package-lock.json
 └── .gitignore
@@ -168,7 +168,7 @@ inaproc-to-excel/
 ### 7.1 Export Paket Penyedia
 
 ```bash
-node penyedia-cli.js D145 2026 100
+node penyedia.js D145 2026 100
 ```
 
 Keterangan:
@@ -182,7 +182,7 @@ Keterangan:
 ### 7.2 Export Paket Swakelola
 
 ```bash
-node swakelola-cli.js D145 2026 100
+node swakelola.js D145 2026 100
 ```
 
 ---
@@ -190,7 +190,7 @@ node swakelola-cli.js D145 2026 100
 ### 7.3 Export Master Satker
 
 ```bash
-node mastersatker-cli.js D145 2026
+node mastersatker.js D145 2026
 ```
 
 ---
