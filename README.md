@@ -1,6 +1,6 @@
 # INAPROC to Excel Exporter
 
-Aplikasi ini berfungsi untuk **mengambil data RUP dari API INAPROC** (Penyedia, Swakelola, dan Master Satker) lalu **menyimpannya ke file Excel (.xlsx)**.
+Aplikasi ini berfungsi untuk **mengambil data RUP dari API INAPROC**, untuk saat ini hanya Penyedia, Swakelola, dan Master Satker lalu **menyimpannya ke file Excel (.xlsx)**.
 
 ---
 
