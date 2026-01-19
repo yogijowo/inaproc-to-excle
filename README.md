@@ -1,6 +1,6 @@
 # INAPROC to Excel Exporter
 
-Aplikasi ini berfungsi untuk **mengambil data RUP dari API INAPROC**, untuk saat ini hanya Penyedia, Swakelola, dan Master Satker lalu **menyimpannya ke file Excel (.xlsx)**.
+Aplikasi ini berfungsi untuk **mengambil data RUP dari API INAPROC**, untuk saat ini hanya Penyedia, Swakelola, Master Satker, dan E-Purchasing lalu **menyimpannya ke file Excel (.xlsx)**.
 
 ---
 
@@ -11,6 +11,7 @@ Setelah mengikuti panduan ini, Anda bisa:
 - Mengambil data RUP **Penyedia** ke Excel
 - Mengambil data RUP **Swakelola** ke Excel
 - Mengambil **Master Satker** ke Excel
+- Mengambil **E-Purchasing** ke Excel
 - Menjalankan perintah langsung dari **Command Prompt / Terminal**
 - Menghasilkan file Excel otomatis dengan nama & timestamp
 
@@ -53,10 +54,6 @@ Jika muncul versi (misalnya `v18.x.x`), berarti berhasil.
 
 ## 3. Menyiapkan Folder Aplikasi
 
-Anda dapat menyiapkan aplikasi dengan **dua cara**. Untuk pemula, **disarankan menggunakan cara A (Clone dari GitHub)**.
-
----
-
 ### 3.A Cara Paling Mudah (Clone dari GitHub) ✅
 
 1. Buka **Command Prompt / PowerShell (Windows)** atau **Terminal (macOS/Linux)**
@@ -72,21 +69,6 @@ git clone https://github.com/yogijowo/inaproc-to-excle.git
 cd inaproc-to-excle
 ```
 
-> Jika muncul pesan error `git is not recognized`, silakan install Git terlebih dahulu dari:
-> [https://git-scm.com/downloads](https://git-scm.com/downloads)
-
----
-
-### 3.B Cara Manual (Tanpa Git)
-
-Jika tidak ingin menggunakan Git:
-
-1. Buka halaman:
-   [https://github.com/yogijowo/inaproc-to-excle](https://github.com/yogijowo/inaproc-to-excle)
-2. Klik tombol **Code → Download ZIP**
-3. Extract ZIP
-4. Buka folder hasil extract
-
 ---
 
 ## 4. Install Dependency (Sekali Saja)
@@ -94,8 +76,7 @@ Jika tidak ingin menggunakan Git:
 Di dalam folder aplikasi, jalankan:
 
 ```bash
-npm init -y
-npm install xlsx
+npm install
 ```
 
 Tunggu sampai selesai.
@@ -121,68 +102,34 @@ module.exports = {
 
 ---
 
-### 5.2 Buat File `.gitignore` (Opsional tapi Disarankan)
+## 6. Cara Menggunakan (LEBIH MUDAH & TERPUSAT) ✅
 
-```text
-node_modules/
-config.js
-```
+Sekarang Anda bisa menggunakan **satu perintah pusat** (`index.js`) untuk semua kebutuhan.
 
-Agar token tidak tersebar jika pakai Git.
+Format:
+`node index.js [perintah] [kode_klpd] [tahun] [limit]`
 
----
+### 6.1 Daftar Perintah
 
-## 6. File yang Digunakan
+| Perintah | Fungsi | Contoh |
+| :--- | :--- | :--- |
+| `penyedia` | Export RUP Penyedia | `node index.js penyedia D145 2026 100` |
+| `swakelola` | Export RUP Swakelola | `node index.js swakelola D145 2026 100` |
+| `satker` | Export Master Satker | `node index.js satker D145 2026` |
+| `epurchasing` | Export E-Purchasing | `node index.js epurchasing D145 2026 100` |
 
-Pastikan folder berisi file berikut:
+### 6.2 Cara Lama (Masih Bisa Digunakan)
 
-```text
-inaproc-to-excel/
-├── node_modules/
-├── config.js
-├── penyedia.js
-├── swakelola.js
-├── mastersatker.js
-├── package.json
-├── package-lock.json
-└── .gitignore
-```
+Jika Anda terbiasa dengan cara lama, perintah berikut **tetap berfungsi**:
+
+- **Penyedia**: `node penyedia.js D145 2026 100`
+- **Swakelola**: `node swakelola.js D145 2026 100`
+- **Satker**: `node mastersatker.js D145 2026`
+- **E-Purchasing**: `node e-purchasing-v6.js D145 2026 100`
 
 ---
 
-## 7. Cara Menggunakan (SANGAT MUDAH)
-
-### 7.1 Export Paket Penyedia
-
-```bash
-node penyedia.js D145 2026 100
-```
-
-Keterangan:
-
-- `D145` → kode KLPD
-- `2026` → tahun anggaran
-- `100` → jumlah data per halaman (limit)
-
----
-
-### 7.2 Export Paket Swakelola
-
-```bash
-node swakelola.js D145 2026 100
-```
-
----
-
-### 7.3 Export Master Satker
-
-```bash
-node mastersatker.js D145 2026
-```
-
----
-
-## 8. Hasil File Excel
+## 7. Hasil File Excel
 
 Setelah selesai, file Excel otomatis dibuat di folder yang sama.
 
@@ -192,6 +139,7 @@ Contoh nama file:
 paket-penyedia-terumumkan-2026_D145_20260114_101530.xlsx
 paket-swakelola-terumumkan-2026_D145_20260114_102010.xlsx
 mastersatker-2026_D145_20260114_102245.xlsx
+list-paket-e-purchasing-v6-2026_D145_20260114_102500.xlsx
 ```
 
 File dapat dibuka dengan:
@@ -202,15 +150,15 @@ File dapat dibuka dengan:
 
 ---
 
-## 9. Jika Terjadi Error
+## 8. Jika Terjadi Error
 
 ### ❌ `node: command not found`
 
 ➡️ Node.js belum terinstall atau belum restart PC
 
-### ❌ `401 / 403 Unauthorized`
+### ❌ `401 / 403 Unauthorized` or `API Request Failed`
 
-➡️ Token salah atau sudah kedaluwarsa
+➡️ Token salah atau sudah kedaluwarsa. Periksa file `config.js`.
 
 ### ❌ File Excel tidak muncul
 
@@ -218,32 +166,13 @@ File dapat dibuka dengan:
 
 ---
 
-## 10. Tips untuk Pengguna Awam
+## 9. Struktur Kode (Untuk Developer)
 
-- Tidak perlu mengubah kode jika hanya ingin ambil data
-- Cukup ganti:
-
-  - kode KLPD
-  - tahun
-
-- Jalankan ulang perintah
-
----
-
-## 11. Catatan Teknis (Opsional)
-
-- API menggunakan pagination **cursor**
-- Aman untuk ribuan data
-- Tidak membebani memori berlebihan
-
----
-
-## 12. Pengembangan Selanjutnya (Opsional)
-
-- 1 perintah export semua (penyedia + swakelola + satker)
-- Excel multi-sheet
-- Jadwal otomatis (cron)
-- Import ke database
+- `index.js` : Entry point utama.
+- `src/api.js` : Logic untuk fetch data dan pagination.
+- `src/excel.js` : Logic untuk export ke Excel.
+- `src/utils.js` : Helper functions.
+- `config.js` : Konfigurasi API (ignored by git).
 
 ---
 
@@ -255,5 +184,3 @@ Jika Anda bisa:
 - Copy–paste perintah
 
 Maka Anda **PASTI BISA** menggunakan aplikasi ini 😊
-
-Jika masih bingung, cukup jalankan satu perintah dan lihat file Excel muncul.

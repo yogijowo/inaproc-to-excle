@@ -3,7 +3,7 @@ const { saveToExcel } = require("./src/excel");
 const { parseArgs } = require("./src/utils");
 
 // endpoint
-const ENDPOINT = "/api/v1/rup/master-satker";
+const ENDPOINT = "/api/v1/ekatalog/paket-e-purchasing";
 
 const args = process.argv.slice(2);
 const params = parseArgs(args);
@@ -17,8 +17,8 @@ const params = parseArgs(args);
 
     saveToExcel({
       data,
-      sheetName: `MASTER SATKER ${params.TAHUN}`,
-      filenamePrefix: "mastersatker",
+      sheetName: `E-PURCHASING ${params.TAHUN}`,
+      filenamePrefix: "list-paket-e-purchasing-v6",
       params,
     });
   } catch (error) {
