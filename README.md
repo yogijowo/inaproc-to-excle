@@ -102,14 +102,27 @@ module.exports = {
 
 ---
 
-## 6. Cara Menggunakan (LEBIH MUDAH & TERPUSAT) ✅
+## 7. Cara Menggunakan (Web Interface & CLI)
 
-Sekarang Anda bisa menggunakan **satu perintah pusat** (`index.js`) untuk semua kebutuhan.
+Aplikasi ini sekarang memiliki **Web Interface** (tampilan browser) yang mudah digunakan, selain CLI.
 
-Format:
+### 7.A Menggunakan Web Interface (Recommended) 🌐
+
+1. Jalankan perintah:
+   ```bash
+   node server.js
+   ```
+2. Buka browser dan kunjungi:
+   [http://localhost:3000](http://localhost:3000)
+3. Isi form, klik "Mulai Export", dan tunggu hingga tombol download muncul.
+
+---
+
+### 7.B Menggunakan CLI (Terminal) 💻
+
+Anda bisa menggunakan perintah pusat `index.js`:
+
 `node index.js [perintah] [kode_klpd] [tahun] [limit]`
-
-### 6.1 Daftar Perintah
 
 | Perintah | Fungsi | Contoh |
 | :--- | :--- | :--- |
@@ -118,9 +131,9 @@ Format:
 | `satker` | Export Master Satker | `node index.js satker D145 2026` |
 | `epurchasing` | Export E-Purchasing | `node index.js epurchasing D145 2026 100` |
 
-### 6.2 Cara Lama (Masih Bisa Digunakan)
+### 7.C Cara Lama (Legacy)
 
-Jika Anda terbiasa dengan cara lama, perintah berikut **tetap berfungsi**:
+Jika masih ingin menggunakan cara lama, file-file ini tetap berfungsi:
 
 - **Penyedia**: `node penyedia.js D145 2026 100`
 - **Swakelola**: `node swakelola.js D145 2026 100`
@@ -129,46 +142,55 @@ Jika Anda terbiasa dengan cara lama, perintah berikut **tetap berfungsi**:
 
 ---
 
-## 7. Hasil File Excel
-
+## 8. Hasil File Excel
+ 
 Setelah selesai, file Excel otomatis dibuat di folder yang sama.
-
+ 
 Contoh nama file:
-
+ 
 ```text
 paket-penyedia-terumumkan-2026_D145_20260114_101530.xlsx
 paket-swakelola-terumumkan-2026_D145_20260114_102010.xlsx
 mastersatker-2026_D145_20260114_102245.xlsx
 list-paket-e-purchasing-v6-2026_D145_20260114_102500.xlsx
 ```
-
+ 
 File dapat dibuka dengan:
-
+ 
 - Microsoft Excel
 - LibreOffice Calc
 - Google Sheets (upload)
-
+ 
 ---
-
-## 8. Jika Terjadi Error
-
+ 
+## 9. Jika Terjadi Error
+ 
 ### ❌ `node: command not found`
-
+ 
 ➡️ Node.js belum terinstall atau belum restart PC
-
+ 
 ### ❌ `401 / 403 Unauthorized` or `API Request Failed`
-
+ 
 ➡️ Token salah atau sudah kedaluwarsa. Periksa file `config.js`.
-
+ 
 ### ❌ File Excel tidak muncul
-
+ 
 ➡️ Pastikan folder punya izin tulis
-
+ 
 ---
-
-## 9. Struktur Kode (Untuk Developer)
-
-- `index.js` : Entry point utama.
+ 
+## 10. Tips untuk Pengguna Awam
+ 
+- **Web Interface**: Paling mudah, tinggal klik-klik.
+- **CLI**: Lebih cepat untuk pengguna mahir.
+ 
+---
+ 
+## 11. Struktur Kode (Untuk Developer)
+ 
+- `server.js` : Backend untuk Web Interface (Express + SSE).
+- `public/` : Frontend files (HTML, CSS, JS).
+- `index.js` : Entry point untuk CLI.
 - `src/api.js` : Logic untuk fetch data dan pagination.
 - `src/excel.js` : Logic untuk export ke Excel.
 - `src/utils.js` : Helper functions.

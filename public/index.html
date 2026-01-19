@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inaproc Exporter</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Inaproc Gateway Exporter</h1>
+            <p>Export data dari Inaproc Gateway ke Excel</p>
+        </header>
+
+        <main>
+            <div class="card">
+                <form id="exportForm">
+                    <div class="form-group">
+                        <label for="command">Jenis Laporan</label>
+                        <select id="command" name="command" required>
+                            <option value="penyedia">RUP Penyedia</option>
+                            <option value="swakelola">RUP Swakelola</option>
+                            <option value="satker">Master Satker</option>
+                            <option value="epurchasing">E-Purchasing</option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="klpd">Kode KLPD</label>
+                            <input type="text" id="klpd" name="klpd" value="D145" placeholder="Contoh: D145" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="tahun">Tahun Anggaran</label>
+                            <input type="number" id="tahun" name="tahun" value="2026" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="limit">Limit per Halaman</label>
+                            <input type="number" id="limit" name="limit" value="100" min="1" max="1000">
+                        </div>
+                    </div>
+
+                    <button type="submit" id="startBtn" class="btn-primary">
+                        <span>Mulai Export</span>
+                    </button>
+                </form>
+            </div>
+
+            <div id="terminal" class="terminal hidden">
+                <div class="terminal-header">
+                    <span class="dot red"></span>
+                    <span class="dot yellow"></span>
+                    <span class="dot green"></span>
+                    <span class="terminal-title">Proses Log</span>
+                </div>
+                <div class="terminal-body" id="logContent">
+                    <!-- Logs will appear here -->
+                </div>
+            </div>
+
+            <div id="downloadSection" class="download-section hidden">
+                <div class="success-icon">✅</div>
+                <h3>Proses Selesai!</h3>
+                <p>File Excel Anda siap diunduh.</p>
+                <a id="downloadLink" href="#" class="btn-download" target="_blank">Download Excel</a>
+                <button id="resetBtn" class="btn-text">Kembali ke Awal</button>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 Inaproc Gateway Exporter Tool @yogijowo</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

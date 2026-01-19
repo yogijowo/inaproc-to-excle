@@ -1,6 +1,6 @@
 const { BASE_URL, TOKEN } = require("../config");
 
-async function fetchAllData({ endpoint, params }) {
+async function fetchAllData({ endpoint, params, onProgress }) {
     let cursor = null;
     let hasMore = true;
     let allData = [];
@@ -8,13 +8,17 @@ async function fetchAllData({ endpoint, params }) {
 
     const { KODE_KLPD, TAHUN, LIMIT } = params;
 
-    console.log(
-        `▶️ Mulai export: KLPD=${KODE_KLPD}, Tahun=${TAHUN}, Limit per request=${LIMIT}\n`
-    );
+    // Helper untuk log ke console DAN callback (jika ada)
+    const log = (msg) => {
+        console.log(msg);
+        if (onProgress) onProgress(msg);
+    };
+
+    log(`▶️ Mulai export: KLPD=${KODE_KLPD}, Tahun=${TAHUN}, Limit per request=${LIMIT}`);
 
     while (hasMore) {
-        console.log(`📄 Page ${page}`);
-        console.log(`   ▶ Cursor request : ${cursor ?? "(kosong / awal)"}`);
+        log(`📄 Page ${page}`);
+        log(`   ▶ Cursor request : ${cursor ?? "(kosong / awal)"}`);
 
         // Build URL with params
         const queryParams = new URLSearchParams();
@@ -35,8 +39,8 @@ async function fetchAllData({ endpoint, params }) {
 
             if (!res.ok) {
                 const text = await res.text().catch(() => "");
-                console.error("❌ Request gagal:", res.status, res.statusText);
-                if (text) console.error("Respons:", text.slice(0, 500));
+                log(`❌ Request gagal: ${res.status} ${res.statusText}`);
+                if (text) log(`Respons: ${text.slice(0, 500)}`);
                 // Kita throw error agar pemanggil bisa handle atau stop
                 throw new Error(`API Request Failed: ${res.status} ${res.statusText}`);
             }
@@ -51,17 +55,18 @@ async function fetchAllData({ endpoint, params }) {
             const newCursor = json?.meta?.cursor ?? null;
             hasMore = Boolean(json?.meta?.has_more);
 
-            console.log(`   ✔ Data diterima : ${pageCount}`);
-            // console.log(`   ▶ Cursor respon : ${newCursor}`); // Optional: hide to reduce noise
-            console.log(`   ▶ Masih ada data? : ${hasMore ? "Ya" : "Tidak"}`);
-            console.log(`   ▶ Total terkumpul : ${allData.length}\n`);
+            log(`   ✔ Data diterima : ${pageCount}`);
+            // log(`   ▶ Cursor respon : ${newCursor}`); // Optional: hide to reduce noise
+            log(`   ▶ Masih ada data? : ${hasMore ? "Ya" : "Tidak"}`);
+            log(`   ▶ Total terkumpul : ${allData.length}`);
 
             cursor = newCursor;
             page++;
         } catch (err) {
-            console.error("❌ Terjadi kesalahan saat fetch data:");
-            console.error(err);
-            process.exit(1);
+            log("❌ Terjadi kesalahan saat fetch data:");
+            log(err.message);
+            // Re-throw agar caller tau ini gagal
+            throw err;
         }
     }
 

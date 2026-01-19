@@ -1,10 +1,15 @@
 const XLSX = require("xlsx");
 const path = require("path");
 
-function saveToExcel({ data, sheetName, filenamePrefix, params }) {
+function saveToExcel({ data, sheetName, filenamePrefix, params, onProgress }) {
+    const log = (msg) => {
+        console.log(msg);
+        if (onProgress) onProgress(msg);
+    };
+
     if (!data || data.length === 0) {
-        console.warn("⚠️ Tidak ada data untuk disimpan.");
-        return;
+        log("⚠️ Tidak ada data untuk disimpan.");
+        return null;
     }
 
     const { KODE_KLPD, TAHUN } = params;
@@ -35,8 +40,10 @@ function saveToExcel({ data, sheetName, filenamePrefix, params }) {
 
     XLSX.writeFile(workbook, filePath);
 
-    console.log("✅ SELESAI EKSPOR");
-    console.log(`📁 File tersimpan: ${filename}`);
+    log("✅ SELESAI EKSPOR");
+    log(`📁 File tersimpan: ${filename}`);
+
+    return filename;
 }
 
 module.exports = {
