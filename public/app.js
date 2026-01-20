@@ -6,6 +6,42 @@ const downloadSection = document.getElementById('downloadSection');
 const downloadLink = document.getElementById('downloadLink');
 const resetBtn = document.getElementById('resetBtn');
 const card = document.querySelector('.card');
+const commandSelect = document.getElementById('command');
+
+// Load commands on startup
+async function loadCommands() {
+    try {
+        const response = await fetch('/api/commands');
+        if (!response.ok) throw new Error('Gagal memuat daftar command');
+
+        const commands = await response.json();
+
+        // Clear "Loading..." option
+        commandSelect.innerHTML = '';
+
+        // Add default option if needed or just select the first one
+        if (commands.length === 0) {
+            const option = document.createElement('option');
+            option.text = "Tidak ada command tersedia";
+            commandSelect.add(option);
+            return;
+        }
+
+        commands.forEach(cmd => {
+            const option = document.createElement('option');
+            option.value = cmd.name;
+            option.textContent = cmd.description;
+            commandSelect.appendChild(option);
+        });
+
+    } catch (error) {
+        console.error('Error loading commands:', error);
+        commandSelect.innerHTML = '<option disabled>Gagal memuat opsi</option>';
+        addLog(`❌ Error loading commands: ${error.message}`);
+    }
+}
+
+loadCommands();
 
 exportForm.addEventListener('submit', (e) => {
     e.preventDefault();

@@ -31,7 +31,24 @@ if (fs.existsSync(commandsDir)) {
         }
     });
 }
+// Endpoint to get list of available commands
+app.get("/api/commands", (req, res) => {
+    const commandList = Object.values(COMMANDS)
+        // Filter out aliases/duplicates if necessary, or just send unique objects.
+        // Since aliases point to the same object in COMMANDS, we can use Set to deduplicate.
+        .filter((cmd, index, self) =>
+            index === self.findIndex((t) => (
+                t.name === cmd.name
+            ))
+        )
+        .map(cmd => ({
+            name: cmd.name,
+            description: cmd.description || cmd.name,
+            endpoint: cmd.endpoint // Optional, mostly for debug
+        }));
 
+    res.json(commandList);
+});
 // SSE Endpoint for streaming progress
 app.get("/api/stream", async (req, res) => {
     const { command, klpd, tahun, limit } = req.query;
