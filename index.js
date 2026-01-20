@@ -2,34 +2,29 @@ const { fetchAllData } = require("./src/api");
 const { saveToExcel } = require("./src/excel");
 const { parseArgs } = require("./src/utils");
 
-const COMMANDS = {
-    penyedia: {
-        endpoint: "/api/v1/rup/paket-penyedia-terumumkan",
-        sheetName: "RUP PENYEDIA",
-        filenamePrefix: "paket-penyedia-terumumkan",
-    },
-    swakelola: {
-        endpoint: "/api/v1/rup/paket-swakelola-terumumkan",
-        sheetName: "RUP SWAKELOLA",
-        filenamePrefix: "paket-swakelola-terumumkan",
-    },
-    mastersatker: {
-        endpoint: "/api/v1/rup/master-satker",
-        sheetName: "MASTER SATKER",
-        filenamePrefix: "mastersatker",
-    },
-    satker: {
-        // Alias untuk mastersatker
-        endpoint: "/api/v1/rup/master-satker",
-        sheetName: "MASTER SATKER",
-        filenamePrefix: "mastersatker",
-    },
-    epurchasing: {
-        endpoint: "/api/v1/ekatalog/paket-e-purchasing",
-        sheetName: "E-PURCHASING",
-        filenamePrefix: "list-paket-e-purchasing-v6",
-    },
-};
+const fs = require("fs");
+const path = require("path");
+
+// Load commands dynamically
+const COMMANDS = {};
+const commandsDir = path.join(__dirname, "src/commands");
+
+if (fs.existsSync(commandsDir)) {
+    fs.readdirSync(commandsDir).forEach((file) => {
+        if (file.endsWith(".js")) {
+            const command = require(path.join(commandsDir, file));
+            if (command.name) {
+                COMMANDS[command.name] = command;
+                // Handle aliases
+                if (command.aliases && Array.isArray(command.aliases)) {
+                    command.aliases.forEach(alias => {
+                        COMMANDS[alias] = command;
+                    });
+                }
+            }
+        }
+    });
+}
 
 const args = process.argv.slice(2);
 const commandName = args[0] ? args[0].toLowerCase() : null;
@@ -37,10 +32,13 @@ const commandName = args[0] ? args[0].toLowerCase() : null;
 if (!commandName || !COMMANDS[commandName]) {
     console.log("❌ Perintah tidak dikenali atau kosong.");
     console.log("Daftar perintah yang tersedia:");
-    console.log("  - penyedia      (Export RUP Penyedia)");
-    console.log("  - swakelola     (Export RUP Swakelola)");
-    console.log("  - satker        (Export Master Satker)");
-    console.log("  - epurchasing   (Export E-Purchasing)");
+    const printedCommands = new Set();
+    Object.values(COMMANDS).forEach((cmd) => {
+        if (!printedCommands.has(cmd.name)) {
+            console.log(`  - ${cmd.name.padEnd(12)} (${cmd.description || "No description"})`);
+            printedCommands.add(cmd.name);
+        }
+    });
     console.log("\nCara penggunaan:");
     console.log("  node index.js [perintah] [kode_klpd] [tahun] [limit]");
     console.log("Contoh:");

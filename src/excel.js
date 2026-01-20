@@ -1,5 +1,6 @@
 const XLSX = require("xlsx");
 const path = require("path");
+const fs = require("fs");
 
 function saveToExcel({ data, sheetName, filenamePrefix, params, onProgress }) {
     const log = (msg) => {
@@ -35,13 +36,19 @@ function saveToExcel({ data, sheetName, filenamePrefix, params, onProgress }) {
     // contoh: paket-penyedia-terumumkan-2026_D145_20260114_101530.xlsx
     const filename = `${filenamePrefix}-${TAHUN}_${KODE_KLPD}_${timestamp}.xlsx`;
 
-    // Clean filename to allow saving in current directory smoothly
-    const filePath = path.join(process.cwd(), filename);
+    // Ensure 'generated_files' directory exists
+    const outputDir = path.join(process.cwd(), "generated_files");
+    if (!fs.existsSync(outputDir)) {
+        fs.mkdirSync(outputDir, { recursive: true });
+    }
+
+    // Clean filename to allow saving in generated_files directory smoothly
+    const filePath = path.join(outputDir, filename);
 
     XLSX.writeFile(workbook, filePath);
 
     log("✅ SELESAI EKSPOR");
-    log(`📁 File tersimpan: ${filename}`);
+    log(`📁 File tersimpan: generated_files/${filename}`);
 
     return filename;
 }

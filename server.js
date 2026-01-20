@@ -11,30 +11,26 @@ const PORT = 3000;
 app.use(cors());
 app.use(express.static("public")); // Serve frontend files
 
-// Config commands mirip dengan index.js
-const COMMANDS = {
-    penyedia: {
-        endpoint: "/api/v1/rup/paket-penyedia-terumumkan",
-        sheetName: "RUP PENYEDIA",
-        filenamePrefix: "paket-penyedia-terumumkan",
-    },
-    swakelola: {
-        endpoint: "/api/v1/rup/paket-swakelola-terumumkan",
-        sheetName: "RUP SWAKELOLA",
-        filenamePrefix: "paket-swakelola-terumumkan",
-    },
-    satker: {
-        endpoint: "/api/v1/rup/master-satker",
-        sheetName: "MASTER SATKER",
-        filenamePrefix: "mastersatker",
-        defaultLimit: 1000 // Master Satker doesn't use limit usually but our API logic supports it
-    },
-    epurchasing: {
-        endpoint: "/api/v1/ekatalog/paket-e-purchasing",
-        sheetName: "E-PURCHASING",
-        filenamePrefix: "list-paket-e-purchasing-v6",
-    },
-};
+// Load commands dynamically
+const COMMANDS = {};
+const commandsDir = path.join(__dirname, "src/commands");
+
+if (fs.existsSync(commandsDir)) {
+    fs.readdirSync(commandsDir).forEach((file) => {
+        if (file.endsWith(".js")) {
+            const command = require(path.join(commandsDir, file));
+            if (command.name) {
+                COMMANDS[command.name] = command;
+                // Handle aliases
+                if (command.aliases && Array.isArray(command.aliases)) {
+                    command.aliases.forEach(alias => {
+                        COMMANDS[alias] = command;
+                    });
+                }
+            }
+        }
+    });
+}
 
 // SSE Endpoint for streaming progress
 app.get("/api/stream", async (req, res) => {
@@ -102,7 +98,7 @@ app.get("/api/stream", async (req, res) => {
 // Download endpoint
 app.get("/download/:filename", (req, res) => {
     const filename = req.params.filename;
-    const filePath = path.join(__dirname, filename);
+    const filePath = path.join(__dirname, "generated_files", filename);
 
     if (fs.existsSync(filePath)) {
         res.download(filePath);
