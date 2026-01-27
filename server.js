@@ -86,6 +86,8 @@ app.get("/api/stream", async (req, res) => {
             endpoint: config.endpoint,
             params,
             onProgress: logCallback,
+            allowedQueryParams: config.allowedQueryParams,
+            clientSideFilter: config.clientSideFilter,
         });
 
         const filename = saveToExcel({

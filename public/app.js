@@ -2,24 +2,64 @@ const startBtn = document.getElementById('startBtn');
 const exportForm = document.getElementById('exportForm');
 const terminal = document.getElementById('terminal');
 const logContent = document.getElementById('logContent');
-const downloadSection = document.getElementById('downloadSection');
+const resultSection = document.getElementById('resultSection');
 const downloadLink = document.getElementById('downloadLink');
 const resetBtn = document.getElementById('resetBtn');
-const card = document.querySelector('.card');
 const commandSelect = document.getElementById('command');
+const statusIcon = document.getElementById('statusIcon');
+const resultTitle = document.getElementById('resultTitle');
+const resultMessage = document.getElementById('resultMessage');
 
-// Load commands on startup
+// State Management
+function setUIState(state, data = {}) {
+    switch (state) {
+        case 'IDLE':
+            exportForm.style.display = 'block';
+            startBtn.style.display = 'block';
+            terminal.classList.add('hidden');
+            resultSection.classList.add('hidden');
+            logContent.innerHTML = '';
+            break;
+        case 'PROCESSING':
+            startBtn.style.display = 'none'; // Lock form, keep visible but hide button? Or hide form?
+            // User requirement: "Switch UI to processing mode" - let's keep inputs visible but disabled?
+            // For improved UX let's hide the button and show terminal below form
+            terminal.classList.remove('hidden');
+            resultSection.classList.add('hidden');
+            break;
+        case 'SUCCESS':
+            // startBtn.style.display = 'none';
+            // terminal.classList.add('hidden'); // Optional: keep terminal or hide it? Let's keep it for context
+            resultSection.classList.remove('hidden');
+
+            // Update Content
+            statusIcon.textContent = '✅';
+            resultTitle.textContent = 'Export Selesai!';
+            resultMessage.textContent = `File ${data.filename || 'Excel'} berhasil dibuat.`;
+            downloadLink.href = data.downloadUrl;
+            downloadLink.classList.remove('hidden');
+            break;
+        case 'ERROR':
+            resultSection.classList.remove('hidden');
+
+            // Update Content
+            statusIcon.textContent = '❌';
+            resultTitle.textContent = 'Proses Gagal';
+            resultMessage.textContent = data.message || 'Terjadi kesalahan saat memproses data.';
+            downloadLink.classList.add('hidden'); // CRITICAL FIX: Hide download button
+            break;
+    }
+}
+
+// Load commands
 async function loadCommands() {
     try {
         const response = await fetch('/api/commands');
         if (!response.ok) throw new Error('Gagal memuat daftar command');
 
         const commands = await response.json();
-
-        // Clear "Loading..." option
         commandSelect.innerHTML = '';
 
-        // Add default option if needed or just select the first one
         if (commands.length === 0) {
             const option = document.createElement('option');
             option.text = "Tidak ada command tersedia";
@@ -33,11 +73,9 @@ async function loadCommands() {
             option.textContent = cmd.description;
             commandSelect.appendChild(option);
         });
-
     } catch (error) {
-        console.error('Error loading commands:', error);
         commandSelect.innerHTML = '<option disabled>Gagal memuat opsi</option>';
-        addLog(`❌ Error loading commands: ${error.message}`);
+        console.error(error);
     }
 }
 
@@ -49,14 +87,13 @@ exportForm.addEventListener('submit', (e) => {
     const formData = new FormData(exportForm);
     const params = new URLSearchParams(formData);
 
-    // Switch UI to processing mode
-    card.classList.add('collapsed');
-    terminal.classList.remove('hidden');
-    downloadSection.classList.add('hidden');
-    logContent.innerHTML = '';
+    setUIState('PROCESSING');
     addLog("🔵 Menghubungkan ke server...");
+    addLog(`🚀 Memulai proses...`);
 
-    // Start SSE connection
+    // Disable inputs
+    Array.from(exportForm.elements).forEach(el => el.disabled = true);
+
     const eventSource = new EventSource(`/api/stream?${params.toString()}`);
 
     eventSource.addEventListener('log', (event) => {
@@ -68,51 +105,60 @@ exportForm.addEventListener('submit', (e) => {
         const data = JSON.parse(event.data);
         addLog("\n✅ PROSES SELESAI!");
         eventSource.close();
-        showDownload(data.downloadUrl);
+
+        // Slight delay for UX
+        setTimeout(() => {
+            setUIState('SUCCESS', data);
+            // Re-enable inputs if needed or wait for reset
+        }, 500);
     });
 
     eventSource.addEventListener('error', (event) => {
-        // Standard error handling for EventSource
+        let msg = "Terjadi kesalahan jaringan.";
         if (event.data) {
-            const data = JSON.parse(event.data);
-            addLog(`❌ ERROR: ${data.message}`);
-        } else {
-            addLog(`⚠️ Koneksi terputus atau terjadi kesalahan jaringan.`);
+            try {
+                const data = JSON.parse(event.data);
+                msg = data.message;
+            } catch (e) {
+                msg = event.data;
+            }
         }
+
+        addLog(`❌ ERROR: ${msg}`);
         eventSource.close();
 
-        // Show back button even on error
+        // Show error state
         setTimeout(() => {
-            downloadSection.classList.remove('hidden');
-            downloadLink.style.display = 'none'; // Hide download button if error
-            document.querySelector('.success-icon').textContent = '⚠️';
-            document.querySelector('h3').textContent = 'Proses Berhenti';
-            document.querySelector('p').textContent = 'Silakan coba lagi atau cek log.';
-        }, 1000);
+            setUIState('ERROR', { message: msg });
+        }, 500);
     });
+
+    eventSource.onerror = (err) => {
+        // Native EventSource error (network down, etc)
+        // If we already handled it via named event 'error', verify readyState
+        if (eventSource.readyState === EventSource.CLOSED) return;
+
+        // addLog("⚠️ Koneksi terputus.");
+        eventSource.close();
+        setUIState('ERROR', { message: "Koneksi ke server terputus." });
+    };
 });
 
 resetBtn.addEventListener('click', () => {
-    card.classList.remove('collapsed');
-    terminal.classList.add('hidden');
-    downloadSection.classList.add('hidden');
-    // Reset texts
-    downloadLink.style.display = 'inline-block';
-    document.querySelector('.success-icon').textContent = '✅';
-    document.querySelector('h3').textContent = 'Proses Selesai!';
-    document.querySelector('p').textContent = 'File Excel Anda siap diunduh.';
+    setUIState('IDLE');
+    // Re-enable inputs
+    Array.from(exportForm.elements).forEach(el => el.disabled = false);
 });
 
 function addLog(message) {
     const line = document.createElement('div');
+    line.className = 'log-entry';
     line.textContent = message;
     logContent.appendChild(line);
-    // Auto scroll to bottom
-    terminal.scrollTop = terminal.scrollHeight; // Scroll container
-    logContent.scrollTop = logContent.scrollHeight; // Scroll content div just in case
-}
 
-function showDownload(url) {
-    downloadLink.href = url;
-    downloadSection.classList.remove('hidden');
+    // Auto scroll with smooth animation
+    logContent.scrollTo({
+        top: logContent.scrollHeight,
+        behavior: 'smooth'
+    });
 }
