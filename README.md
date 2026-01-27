@@ -2,6 +2,8 @@
 
 **INAPROC to Excel Exporter** adalah alat profesional yang dirancang untuk memudahkan pengambilan data RUP (Rencana Umum Pengadaan) dari API INAPROC langsung menjadi file Excel yang rapi. Aplikasi ini menyediakan **Tampilan Web (Web Interface)** yang mudah digunakan dan **Command Line Interface (CLI)** untuk pengguna tingkat lanjut.
 
+![Tampilan Aplikasi](screenshot/image.png)
+
 ---
 
 ## 🚀 Fitur Utama
